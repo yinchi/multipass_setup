@@ -33,10 +33,14 @@ if not data:
 ips = []
 
 print("Running instances:")
-for i, item in enumerate(data.items()):
+for item in data.items():
     k, v = item
-    print (f"{i+1}. {k} ({v['ipv4'][0]})")
-    ips.append(v['ipv4'][0])
+    # Assume the first IPv4 address starting with '10.' is the desired one
+    ips = [ip for ip in v['ipv4'] if ip.startswith('10.')]
+    if not ips:
+        continue
+    ips.append(ips[0])
+    print (f"{len(ips)}. {k} ({ips[0]})")
 
 # Prompt user to select an instance
 print()

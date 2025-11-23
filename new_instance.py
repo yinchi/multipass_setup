@@ -15,7 +15,7 @@ import subprocess
 SSH_PATH = '.ssh/id_ed25519.pub'
 DEFAULT_CPUS = 4
 DEFAULT_MEM_GB = 4
-DEFAULT_DISK_GB = 10
+DEFAULT_DISK_GB = 32
 
 ################################################################################
 
@@ -30,24 +30,27 @@ name_pattern = re.compile(r'[a-z0-9]+(?:-[a-z0-9]+)*')
 )
 @click.argument('name')
 @click.option('--ssh-path', '-s', default=SSH_PATH,
-              help='Path to the SSH public key relative to the user\'s home directory. ')
-@click.option('--dry-run', '-d', is_flag=True,
+              help='Path to the SSH public key relative to the user\'s home directory. '
+              f'(default: ~/{SSH_PATH})')
+@click.option('--dry-run', is_flag=True,
               help='If set, the script will only print the commands without executing them.')
 @click.option('--cpus', '-c',
-              help='The number of CPUs for the new instance. (default: 4)',
+              help='The number of CPUs for the new instance. (default: '
+              f'{DEFAULT_CPUS})',
               default=DEFAULT_CPUS, type=int)
 @click.option('--memory', '-m',
-              help='The amount of memory for the new instance in GB. (default: 4)',
+              help='The amount of memory for the new instance in GB. (default: '
+              f'{DEFAULT_MEM_GB})',
               default=DEFAULT_MEM_GB, type=int)
 @click.option('--disk', '-d',
-              help='The amount of disk space for the new instance in GB. (default: 10)',
+              help='The amount of disk space for the new instance in GB. (default: '
+              f'{DEFAULT_DISK_GB})',
               default=DEFAULT_DISK_GB, type=int)
 def create_instance(name, cpus, memory, disk, ssh_path, dry_run):
     """Create a new Multipass instance with the given name.
 
     To enable SSH access, the script reads the SSH public key from the path
-    defined by SSH_PATH (default: ~/.ssh/id_ed25519.pub) and adds it to the
-    authorized_keys of the new instance.
+    defined by SSH_PATH and adds it to the authorized_keys of the new instance.
     """
 
     ssh_path = pathlib.Path.home() / ssh_path
@@ -78,7 +81,8 @@ def create_instance(name, cpus, memory, disk, ssh_path, dry_run):
                "--name", name,
                "--cpus", str(cpus),
                "--memory", f"{memory}G",
-               "--disk", f"{disk}G"]
+               "--disk", f"{disk}G",
+               "--bridged"]
     if dry_run:
         click.echo(" ".join(command))
     else:

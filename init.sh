@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Script to run on a newly created Multipass instance (via `new_instance.py`)
 
 set -euo pipefail
 
